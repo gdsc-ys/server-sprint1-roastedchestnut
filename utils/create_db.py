@@ -117,6 +117,6 @@ con.commit()
 for _ in range(1000):
     cur.execute("""INSERT INTO management(manager_id, history_id, type)
     VALUES(?, ?, ?)
-    """, (random.randint(1, 200), random.randint(1, 10000), random.choice(["Web, Mobile, Offline"])))
+    """, (random.randint(1, 200), random.randint(1, 10000), random.choice(["Web", "Mobile", "Offline"])))
 
 con.commit()
