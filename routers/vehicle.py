@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from utils.data import get_connection
@@ -48,3 +48,10 @@ async def update_vehicle(vehicle_id: int, vehicle: Vehicle):
     row = cur.fetchone()
     con.commit()
     return dict(row)
+
+
+@router.delete("/{vehicle_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_vehicle(vehicle_id: int):
+    con = get_connection()
+    cur = con.execute("DELETE FROM vehicle WHERE id = (?)", (vehicle_id,))
+    con.commit()

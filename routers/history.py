@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from utils.data import get_connection
@@ -70,3 +70,10 @@ async def update_history(history_id: int, history: History):
     row = cur.fetchone()
     con.commit()
     return dict(row)
+
+
+@router.delete("/{history_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_history(history_id: int):
+    con = get_connection()
+    cur = con.execute("DELETE FROM history WHERE id = (?)", (history_id,))
+    con.commit()

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from utils.data import get_connection
@@ -49,7 +49,7 @@ async def create_management(management: Management):
     
 
 @router.put("/{manager_id}/{history_id}")
-async def update_history(manager_id: int, history_id: int, management: Management):
+async def update_management(manager_id: int, history_id: int, management: Management):
     con = get_connection()
     cur = con.execute("""UPDATE management
             SET type = (?)
@@ -61,3 +61,10 @@ async def update_history(manager_id: int, history_id: int, management: Managemen
         raise HTTPException(status_code=404, detail="management not found")
     con.commit()
     return dict(row)
+
+
+@router.delete("/{manager_id}/{history_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_management(manager_id: int, history_id: int):
+    con = get_connection()
+    cur = con.execute("DELETE FROM management WHERE manager_id = (?) AND history_id = (?)", (manager_id, history_id,))
+    con.commit()
