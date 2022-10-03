@@ -65,7 +65,7 @@ cur.execute("""CREATE TABLE management(
 con.commit()
 
 # random user generator
-for _ in range(5000):
+for _ in range(10000):
     if random.choice([True, False]):
         cur.execute("""INSERT INTO user(name, age, sex)
             VALUES(?, ?, ?)
@@ -77,13 +77,13 @@ for _ in range(5000):
 
 con.commit()
 
-# random vehicle generator
-for _ in range(1000):
-    if random.randint(1, 1000) < 500:
+# random vehicle generator  
+for _ in range(10000):
+    if random.randint(1, 10) < 5:
         cur.execute("""INSERT INTO vehicle(type, status)
             VALUES(?, ?)
             """, ("Car", "Available",))
-    elif 500 <= random.randint(1, 1000) < 900:
+    elif 500 <= random.randint(1, 10) < 9:
         cur.execute("""INSERT INTO vehicle(type, status)
             VALUES(?, ?)
             """, ("Scooter", "Available",))
@@ -95,7 +95,7 @@ for _ in range(1000):
 con.commit()
 
 # random manager generator
-for _ in range(200):
+for _ in range(500):
     if random.choice([True, False]):
         cur.execute("""INSERT INTO manager(name, age, sex, admin)
             VALUES(?, ?, ?, ?)
@@ -115,20 +115,20 @@ random_number_of_days = random.randrange(days_between_dates)
 random_start_date = start_date + datetime.timedelta(days=random_number_of_days)
 random_end_date = random_start_date + datetime.timedelta(days=random.randint(1, 28))
 
-for _ in range(10000):
+for _ in range(100000):
     random_number_of_days = random.randrange(days_between_dates)
     random_start_date = start_date + datetime.timedelta(days=random_number_of_days)
     random_end_date = random_start_date + datetime.timedelta(days=random.randint(1, 28))
     cur.execute("""INSERT INTO history(user_id, vehicle_id, start_date, end_date)
         VALUES(?, ?, ?, ?)
-        """, (random.randint(1, 5000), random.randint(1, 1000), random_start_date, random_end_date,))
+        """, (random.randint(1, 10000), random.randint(1, 10000), random_start_date, random_end_date,))
 
 con.commit()
 
 # random management generator
-for _ in range(1000):
-    cur.execute("""INSERT INTO management(manager_id, history_id, type)
+for _ in range(50000):
+    cur.execute("""INSERT OR IGNORE INTO management(manager_id, history_id, type)
     VALUES(?, ?, ?)
-    """, (random.randint(1, 200), random.randint(1, 10000), random.choice(["Web", "Mobile", "Offline"])))
+    """, (random.randint(1, 500), random.randint(1, 100000), random.choice(["Web", "Mobile", "Offline"])))
 
 con.commit()
