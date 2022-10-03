@@ -15,11 +15,15 @@ cur.execute("""CREATE TABLE user(
     sex TEXT
     )""")
 
+con.commit()
+
 cur.execute("""CREATE TABLE vehicle(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
     type TEXT, 
     status TEXT
     )""")
+    
+con.commit()
 
 cur.execute("""CREATE TABLE manager(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
@@ -28,6 +32,8 @@ cur.execute("""CREATE TABLE manager(
     sex TEXT,
     admin INTEGER
     )""")
+    
+con.commit()
 
 cur.execute("""CREATE TABLE history(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
@@ -40,6 +46,8 @@ cur.execute("""CREATE TABLE history(
     FOREIGN KEY (vehicle_id) REFERENCES vehicle (id)
     ON DELETE CASCADE ON UPDATE CASCADE
     )""")
+    
+con.commit()
 
 cur.execute("""CREATE TABLE management(
     manager_id INTEGER NOT NULL,
@@ -51,6 +59,8 @@ cur.execute("""CREATE TABLE management(
     FOREIGN KEY (history_id) REFERENCES history (id)
     ON DELETE CASCADE ON UPDATE CASCADE
     )""")
+    
+con.commit()
 
 # random user generator
 for _ in range(5000):
