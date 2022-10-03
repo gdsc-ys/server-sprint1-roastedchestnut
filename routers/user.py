@@ -16,11 +16,12 @@ router = APIRouter(
     tags=["user"],
 )
 
+con, cur = get_connection()
+
 
 @router.get("/{user_id}")
 async def read_user(user_id: int):
-    con = get_connection()
-    cur = con.execute("SELECT * FROM user WHERE id = (?)", (user_id,))
+    cur.execute("SELECT * FROM user WHERE id = (?)", (user_id,))
     row = cur.fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="user not found")
@@ -29,10 +30,9 @@ async def read_user(user_id: int):
 
 @router.post("/")
 async def create_user(user: User):
-    con = get_connection()
-    cur = con.execute("""INSERT INTO user(name, age, sex)
-            VALUES(?, ?, ?)
-            """, (user.name, user.age, user.sex,))
+    cur.execute("""INSERT INTO user(name, age, sex)
+        VALUES(?, ?, ?)
+        """, (user.name, user.age, user.sex,))
     cur.execute("SELECT * FROM user WHERE id = (?)", (cur.lastrowid,))
     row = cur.fetchone()
     con.commit()
@@ -41,11 +41,10 @@ async def create_user(user: User):
 
 @router.put("/{user_id}")
 async def update_user(user_id: int, user: User):
-    con = get_connection()
-    cur = con.execute("""UPDATE user
-            SET name = (?), age = (?), sex = (?)
-            WHERE id = (?)
-            """, (user.name, user.age, user.sex, user_id,))
+    cur.execute("""UPDATE user
+        SET name = (?), age = (?), sex = (?)
+        WHERE id = (?)
+        """, (user.name, user.age, user.sex, user_id,))
     cur.execute("SELECT * FROM user WHERE id = (?)", (user_id,))
     row = cur.fetchone()
     con.commit()
@@ -54,6 +53,5 @@ async def update_user(user_id: int, user: User):
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: int):
-    con = get_connection()
-    cur = con.execute("DELETE FROM user WHERE id = (?)", (user_id,))
+    cur.execute("DELETE FROM user WHERE id = (?)", (user_id,))
     con.commit()

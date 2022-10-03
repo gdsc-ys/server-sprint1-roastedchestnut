@@ -14,11 +14,12 @@ router = APIRouter(
     tags=["vehicle"],
 )
 
+con, cur = get_connection()
+
 
 @router.get("/{vehicle_id}")
 async def read_vehicle(vehicle_id: int):
-    con = get_connection()
-    cur = con.execute("SELECT * FROM vehicle WHERE id = (?)", (vehicle_id,))
+    cur.execute("SELECT * FROM vehicle WHERE id = (?)", (vehicle_id,))
     row = cur.fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="vehicle not found")
@@ -27,10 +28,9 @@ async def read_vehicle(vehicle_id: int):
 
 @router.post("/")
 async def create_vehicle(vehicle: Vehicle):
-    con = get_connection()
-    cur = con.execute("""INSERT INTO vehicle(type, status)
-            VALUES(?, ?)
-            """, (vehicle.type, vehicle.status,))
+    cur.execute("""INSERT INTO vehicle(type, status)
+        VALUES(?, ?)
+        """, (vehicle.type, vehicle.status,))
     cur.execute("SELECT * FROM vehicle WHERE id = (?)", (cur.lastrowid,))
     row = cur.fetchone()
     con.commit()
@@ -39,11 +39,10 @@ async def create_vehicle(vehicle: Vehicle):
 
 @router.put("/{vehicle_id}")
 async def update_vehicle(vehicle_id: int, vehicle: Vehicle):
-    con = get_connection()
-    cur = con.execute("""UPDATE vehicle
-            SET type = (?), status = (?)
-            WHERE id = (?)
-            """, (vehicle.type, vehicle.status, vehicle_id,))
+    cur.execute("""UPDATE vehicle
+        SET type = (?), status = (?)
+        WHERE id = (?)
+        """, (vehicle.type, vehicle.status, vehicle_id,))
     cur.execute("SELECT * FROM vehicle WHERE id = (?)", (vehicle_id,))
     row = cur.fetchone()
     con.commit()
@@ -52,6 +51,5 @@ async def update_vehicle(vehicle_id: int, vehicle: Vehicle):
 
 @router.delete("/{vehicle_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_vehicle(vehicle_id: int):
-    con = get_connection()
-    cur = con.execute("DELETE FROM vehicle WHERE id = (?)", (vehicle_id,))
+    cur.execute("DELETE FROM vehicle WHERE id = (?)", (vehicle_id,))
     con.commit()

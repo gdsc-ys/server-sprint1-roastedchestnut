@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 from utils.data import get_connection
 
-
 class Management(BaseModel):
     manager_id: int
     history_id: int
@@ -15,11 +14,12 @@ router = APIRouter(
     tags=["management"],
 )
 
+con, cur = get_connection()
+
 
 @router.get("/manager/{manager_id}}")
 async def read_management_manager(manager_id: int):
-    con = get_connection()
-    cur = con.execute("SELECT * FROM management WHERE manager_id = (?)", (manager_id,))
+    cur.execute("SELECT * FROM management WHERE manager_id = (?)", (manager_id,))
     rows = cur.fetchall()
     if rows is None:
         raise HTTPException(status_code=404, detail="management not found")
@@ -28,8 +28,7 @@ async def read_management_manager(manager_id: int):
 
 @router.get("/history/{history_id}}")
 async def read_management_history(history_id: int):
-    con = get_connection()
-    cur = con.execute("SELECT * FROM management WHERE history_id = (?)", (history_id,))
+    cur.execute("SELECT * FROM management WHERE history_id = (?)", (history_id,))
     rows = cur.fetchall()
     if rows is None:
         raise HTTPException(status_code=404, detail="management not found")
@@ -38,10 +37,9 @@ async def read_management_history(history_id: int):
 
 @router.post("/")
 async def create_management(management: Management):
-    con = get_connection()
-    cur = con.execute("""INSERT INTO management(manager_id, history_id, type)
-            VALUES(?, ?, ?)
-            """, (management.manager_id, management.history_id, management.type,))
+    cur.execute("""INSERT INTO management(manager_id, history_id, type)
+        VALUES(?, ?, ?)
+        """, (management.manager_id, management.history_id, management.type,))
     cur.execute("SELECT * FROM management WHERE manager_id = (?) AND history_id = (?)", (management.manager_id, management.history_id,))
     row = cur.fetchone()
     con.commit()
@@ -50,11 +48,10 @@ async def create_management(management: Management):
 
 @router.put("/{manager_id}/{history_id}")
 async def update_management(manager_id: int, history_id: int, management: Management):
-    con = get_connection()
-    cur = con.execute("""UPDATE management
-            SET type = (?)
-            WHERE manager_id = (?) AND history_id = (?)
-            """, (management.type, manager_id, history_id,))
+    cur.execute("""UPDATE management
+        SET type = (?)
+        WHERE manager_id = (?) AND history_id = (?)
+        """, (management.type, manager_id, history_id,))
     cur.execute("SELECT * FROM management WHERE manager_id = (?) AND history_id = (?)", (manager_id, history_id,))
     row = cur.fetchone()
     if row is None:
@@ -65,6 +62,5 @@ async def update_management(manager_id: int, history_id: int, management: Manage
 
 @router.delete("/{manager_id}/{history_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_management(manager_id: int, history_id: int):
-    con = get_connection()
-    cur = con.execute("DELETE FROM management WHERE manager_id = (?) AND history_id = (?)", (manager_id, history_id,))
+    cur.execute("DELETE FROM management WHERE manager_id = (?) AND history_id = (?)", (manager_id, history_id,))
     con.commit()
