@@ -48,6 +48,8 @@ async def update_manager(manager_id: int, manager: Manager):
     cur.execute("SELECT * FROM manager WHERE id = (?)", (manager_id,))
     row = cur.fetchone()
     con.commit()
+    if row is None:
+        raise HTTPException(status_code=404, detail="manager not found")
     return dict(row)
 
 

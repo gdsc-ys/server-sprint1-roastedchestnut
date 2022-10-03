@@ -66,6 +66,8 @@ async def update_history(history_id: int, history: History):
     cur.execute("SELECT * FROM history WHERE id = (?)", (history_id,))
     row = cur.fetchone()
     con.commit()
+    if row is None:
+        raise HTTPException(status_code=404, detail="history not found")
     return dict(row)
 
 

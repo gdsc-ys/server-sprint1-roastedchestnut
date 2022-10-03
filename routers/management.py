@@ -54,9 +54,9 @@ async def update_management(manager_id: int, history_id: int, management: Manage
         """, (management.type, manager_id, history_id,))
     cur.execute("SELECT * FROM management WHERE manager_id = (?) AND history_id = (?)", (manager_id, history_id,))
     row = cur.fetchone()
+    con.commit()
     if row is None:
         raise HTTPException(status_code=404, detail="management not found")
-    con.commit()
     return dict(row)
 
 

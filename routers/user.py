@@ -48,6 +48,8 @@ async def update_user(user_id: int, user: User):
     cur.execute("SELECT * FROM user WHERE id = (?)", (user_id,))
     row = cur.fetchone()
     con.commit()
+    if row is None:
+        raise HTTPException(status_code=404, detail="user not found")
     return dict(row)
 
 

@@ -46,6 +46,8 @@ async def update_vehicle(vehicle_id: int, vehicle: Vehicle):
     cur.execute("SELECT * FROM vehicle WHERE id = (?)", (vehicle_id,))
     row = cur.fetchone()
     con.commit()
+    if row is None:
+        raise HTTPException(status_code=404, detail="vehicle not found")
     return dict(row)
 
 
