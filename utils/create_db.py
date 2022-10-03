@@ -1,12 +1,14 @@
-import sqlite3
-import random
+import sqlite3, random, datetime
 import names
-import datetime
 
 
 con = sqlite3.connect("rental.db")
 
 cur = con.cursor()
+
+cur.execute("PRAGMA foreign_keys = ON")
+
+con.commit()
 
 cur.execute("""CREATE TABLE user(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
