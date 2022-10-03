@@ -1,3 +1,4 @@
+from http.client import USE_PROXY
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -33,6 +34,19 @@ async def create_user(user: User):
             VALUES(?, ?, ?)
             """, (user.name, user.age, user.sex,))
     cur.execute("SELECT * FROM user WHERE id = (?)", (cur.lastrowid,))
+    row = cur.fetchone()
+    con.commit()
+    return dict(row)
+
+
+@router.put("/{user_id}")
+async def update_user(user_id: int, user: User):
+    con = get_connection()
+    cur = con.execute("""UPDATE user
+            SET name = (?), age = (?), sex = (?)
+            WHERE id = (?)
+            """, (user.name, user.age, user.sex, user_id,))
+    cur.execute("SELECT * FROM user WHERE id = (?)", (user_id,))
     row = cur.fetchone()
     con.commit()
     return dict(row)

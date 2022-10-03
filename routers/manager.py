@@ -38,3 +38,15 @@ async def create_manager(manager: Manager):
     con.commit()
     return dict(row)
     
+
+@router.put("/{manager_id}")
+async def update_manager(manager_id: int, manager: Manager):
+    con = get_connection()
+    cur = con.execute("""UPDATE manager
+            SET name = (?), age = (?), sex = (?), admin = (?)
+            WHERE id = (?)
+            """, (manager.name, manager.age, manager.sex, manager.admin, manager_id,))
+    cur.execute("SELECT * FROM manager WHERE id = (?)", (manager_id,))
+    row = cur.fetchone()
+    con.commit()
+    return dict(row)

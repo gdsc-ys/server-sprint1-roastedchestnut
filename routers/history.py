@@ -58,3 +58,15 @@ async def create_history(history: History):
     con.commit()
     return dict(row)
     
+
+@router.put("/{history_id}")
+async def update_history(history_id: int, history: History):
+    con = get_connection()
+    cur = con.execute("""UPDATE history
+            SET user_id = (?), vehicle_id = (?), start_date = (?), end_date = (?)
+            WHERE id = (?)
+            """, (history.user_id, history.vehicle_id, history.start_date, history.end_date, history_id,))
+    cur.execute("SELECT * FROM history WHERE id = (?)", (history_id,))
+    row = cur.fetchone()
+    con.commit()
+    return dict(row)

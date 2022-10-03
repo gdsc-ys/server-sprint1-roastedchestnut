@@ -35,3 +35,16 @@ async def create_vehicle(vehicle: Vehicle):
     row = cur.fetchone()
     con.commit()
     return dict(row)
+
+
+@router.put("/{vehicle_id}")
+async def update_vehicle(vehicle_id: int, vehicle: Vehicle):
+    con = get_connection()
+    cur = con.execute("""UPDATE vehicle
+            SET type = (?), status = (?)
+            WHERE id = (?)
+            """, (vehicle.type, vehicle.status, vehicle_id,))
+    cur.execute("SELECT * FROM vehicle WHERE id = (?)", (vehicle_id,))
+    row = cur.fetchone()
+    con.commit()
+    return dict(row)

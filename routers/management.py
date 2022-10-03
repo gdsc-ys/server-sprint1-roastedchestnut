@@ -42,8 +42,22 @@ async def create_management(management: Management):
     cur = con.execute("""INSERT INTO management(manager_id, history_id, type)
             VALUES(?, ?, ?)
             """, (management.manager_id, management.history_id, management.type,))
-    cur.execute("SELECT * FROM management WHERE manager_id = (?) and history_id = (?)", (management.manager_id, management.history_id,))
+    cur.execute("SELECT * FROM management WHERE manager_id = (?) AND history_id = (?)", (management.manager_id, management.history_id,))
     row = cur.fetchone()
     con.commit()
     return dict(row)
     
+
+@router.put("/{manager_id}/{history_id}")
+async def update_history(manager_id: int, history_id: int, management: Management):
+    con = get_connection()
+    cur = con.execute("""UPDATE management
+            SET type = (?)
+            WHERE manager_id = (?) AND history_id = (?)
+            """, (management.type, manager_id, history_id,))
+    cur.execute("SELECT * FROM management WHERE manager_id = (?) AND history_id = (?)", (manager_id, history_id,))
+    row = cur.fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="management not found")
+    con.commit()
+    return dict(row)
