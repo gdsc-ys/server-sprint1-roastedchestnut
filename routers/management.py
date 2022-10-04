@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Response
 from pydantic import BaseModel
 
-from utils.data import get_connection
+from utils.data import get_connection, get_redis_connection
+import json
 
 
 class Management(BaseModel):
@@ -17,6 +18,8 @@ router = APIRouter(
 
 con, cur = get_connection()
 
+r = get_redis_connection()
+
 
 @router.get("/manager/{manager_id}")
 async def read_management_manager(manager_id: int):
@@ -31,6 +34,25 @@ async def read_management_manager(manager_id: int):
 async def read_management_history(history_id: int):
     cur.execute("SELECT * FROM management WHERE history_id = (?)", (history_id,))
     rows = cur.fetchall()
+    if rows is None:
+        raise HTTPException(status_code=404, detail="management not found")
+    return [dict(row) for row in rows]
+
+
+# endpoint specific optimization using redis as cache
+@router.get("/{start_date}")
+async def read_management_start_date(start_date: str, response: Response):
+    if r.exists(start_date):
+        rows = json.loads(r.get(start_date))
+        response.headers["X-Cached"] = "True"
+    else:
+        cur.execute("""SELECT *
+            FROM history
+            INNER JOIN management
+            ON management.history_id = history.id WHERE start_date = (?)""", (start_date,))
+        rows = cur.fetchall()
+        r.set(start_date, json.dumps(rows))
+        response.headers["X-Cached"] = "False"
     if rows is None:
         raise HTTPException(status_code=404, detail="management not found")
     return [dict(row) for row in rows]
