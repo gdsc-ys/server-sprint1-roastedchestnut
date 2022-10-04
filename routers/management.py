@@ -18,7 +18,7 @@ router = APIRouter(
 con, cur = get_connection()
 
 
-@router.get("/manager/{manager_id}}")
+@router.get("/manager/{manager_id}")
 async def read_management_manager(manager_id: int):
     cur.execute("SELECT * FROM management WHERE manager_id = (?)", (manager_id,))
     rows = cur.fetchall()
@@ -27,7 +27,7 @@ async def read_management_manager(manager_id: int):
     return [dict(row) for row in rows]
 
 
-@router.get("/history/{history_id}}")
+@router.get("/history/{history_id}")
 async def read_management_history(history_id: int):
     cur.execute("SELECT * FROM management WHERE history_id = (?)", (history_id,))
     rows = cur.fetchall()
