@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from utils.data import get_connection
 
+
 class Management(BaseModel):
     manager_id: int
     history_id: int
