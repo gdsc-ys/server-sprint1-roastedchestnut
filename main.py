@@ -1,7 +1,7 @@
 import time
 
 from fastapi import FastAPI, Request
-from routers import history, management, manager, user, vehicle
+from routers import history, management, manager, user, vehicle, auth
 
 
 app = FastAPI()
@@ -11,6 +11,7 @@ app.include_router(vehicle.router)
 app.include_router(manager.router)
 app.include_router(history.router)
 app.include_router(management.router)
+app.include_router(auth.router)
 
 
 @app.middleware("http")
